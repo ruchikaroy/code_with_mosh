@@ -1,3 +1,4 @@
+import Button from "./components/Button";
 import ListGroup from "./components/ListGroup";
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   return (
     <>
       <ListGroup items={items} heading="City Names" onSelect={handleSelect} />
+      <Button color="primary">My Button</Button>
     </>
   );
 }
