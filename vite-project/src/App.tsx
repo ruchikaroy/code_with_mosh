@@ -15,6 +15,7 @@ function App() {
   const [alertVisible, setAlertVisibility] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
+  const [isLoading, setLoading] = useState(true);
 
   const handleSelect = (item: string) => {
     console.log(item);
@@ -22,15 +23,22 @@ function App() {
   };
   useEffect(() => {
     const controller = new AbortController();
+    setLoading(true);
     axios
       .get<User[]>("https://jsonplaceholder.typicode.com/users", {
         signal: controller.signal,
       })
-      .then((res) => setUsers(res.data))
+      .then((res) => {
+        setUsers(res.data);
+        setLoading(false);
+      })
       .catch((error) => {
         if (error instanceof CanceledError) {
           return;
-        } else setError(error.message);
+        } else {
+          setError(error.message);
+          setLoading(false);
+        }
       });
 
     return () => controller.abort();
@@ -46,6 +54,7 @@ function App() {
         My Button
       </Button>
       <div className="mt-4">
+        {isLoading && <div className="spinner-border m-5"></div>}
         {error && <p className="text-danger">{error}</p>}
         <ul>
           {users.map((user) => (
