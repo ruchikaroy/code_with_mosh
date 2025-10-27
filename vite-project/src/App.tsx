@@ -43,6 +43,16 @@ function App() {
 
     return () => controller.abort();
   }, []);
+  const deleteUser = (user: User) => {
+    const originalUsers = [...users];
+    setUsers(users.filter((u) => user.id !== u.id));
+    axios
+      .delete("https://jsonplaceholder.typicode.com/users/" + user.id)
+      .catch((error) => {
+        setError(error.message);
+        setUsers(originalUsers);
+      });
+  };
 
   return (
     <>
@@ -53,12 +63,23 @@ function App() {
       <Button color="primary" onClick={() => setAlertVisibility(true)}>
         My Button
       </Button>
-      <div className="mt-4">
+      <div className="mt-4 ">
         {isLoading && <div className="spinner-border m-5"></div>}
         {error && <p className="text-danger">{error}</p>}
-        <ul>
+        <ul className="list-group">
           {users.map((user) => (
-            <li key={user.id}>{user.name}</li>
+            <li
+              className="list-group-item d-flex justify-content-between"
+              key={user.id}
+            >
+              {user.name}
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => deleteUser(user)}
+              >
+                Delete
+              </button>
+            </li>
           ))}
         </ul>
       </div>
