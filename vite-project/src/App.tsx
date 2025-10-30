@@ -54,6 +54,19 @@ function App() {
       });
   };
 
+  const addUser = () => {
+    const originalUsers = [...users];
+    const newUser = { id: 0, name: "Mosh" };
+    setUsers([newUser, ...users]);
+    axios
+      .post("https://jsonplaceholder.typicode.com/users/", newUser)
+      .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
+      .catch((error) => {
+        setError(error.messsage);
+        setUsers(originalUsers);
+      });
+  };
+
   return (
     <>
       <ListGroup items={items} heading="City Names" onSelect={handleSelect} />
@@ -66,6 +79,9 @@ function App() {
       <div className="mt-4 ">
         {isLoading && <div className="spinner-border m-5"></div>}
         {error && <p className="text-danger">{error}</p>}
+        <button className="btn btn-primary my-5" onClick={() => addUser()}>
+          Add
+        </button>
         <ul className="list-group">
           {users.map((user) => (
             <li
@@ -73,12 +89,15 @@ function App() {
               key={user.id}
             >
               {user.name}
-              <button
-                className="btn btn-outline-danger"
-                onClick={() => deleteUser(user)}
-              >
-                Delete
-              </button>
+              <div>
+                <button
+                  className="btn btn-outline-danger mx-2"
+                  onClick={() => deleteUser(user)}
+                >
+                  Delete
+                </button>
+                <button className="btn btn-outline-primary">Update</button>
+              </div>
             </li>
           ))}
         </ul>
