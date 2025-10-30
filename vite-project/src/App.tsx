@@ -66,6 +66,20 @@ function App() {
         setUsers(originalUsers);
       });
   };
+  const updateUser = (user: User) => {
+    const updatedUser = { ...user, name: user.name + "!" };
+    const originalUsers = [...users];
+    setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
+    axios
+      .patch(
+        "https://jsonplaceholder.typicode.com/users/" + user.id,
+        updatedUser
+      )
+      .catch((error) => {
+        setError(error.message);
+        setUsers(originalUsers);
+      });
+  };
 
   return (
     <>
@@ -78,10 +92,10 @@ function App() {
       </Button>
       <div className="mt-4 ">
         {isLoading && <div className="spinner-border m-5"></div>}
-        {error && <p className="text-danger">{error}</p>}
         <button className="btn btn-primary my-5" onClick={() => addUser()}>
           Add
         </button>
+        {error && <p className="text-danger">{error}</p>}
         <ul className="list-group">
           {users.map((user) => (
             <li
@@ -96,7 +110,12 @@ function App() {
                 >
                   Delete
                 </button>
-                <button className="btn btn-outline-primary">Update</button>
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={() => updateUser(user)}
+                >
+                  Update
+                </button>
               </div>
             </li>
           ))}
