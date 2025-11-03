@@ -2,8 +2,7 @@ import Alert from "./components/Alert";
 import Button from "./components/Button";
 import ListGroup from "./components/ListGroup";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { CanceledError } from "axios";
+import apiClient, { CanceledError } from "./services/api-client";
 
 interface User {
   name: string;
@@ -24,8 +23,8 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    axios
-      .get<User[]>("https://jsonplaceholder.typicode.com/users", {
+    apiClient
+      .get<User[]>("/users", {
         signal: controller.signal,
       })
       .then((res) => {
@@ -46,20 +45,18 @@ function App() {
   const deleteUser = (user: User) => {
     const originalUsers = [...users];
     setUsers(users.filter((u) => user.id !== u.id));
-    axios
-      .delete("https://jsonplaceholder.typicode.com/users/" + user.id)
-      .catch((error) => {
-        setError(error.message);
-        setUsers(originalUsers);
-      });
+    apiClient.delete("/users/" + user.id).catch((error) => {
+      setError(error.message);
+      setUsers(originalUsers);
+    });
   };
 
   const addUser = () => {
     const originalUsers = [...users];
     const newUser = { id: 0, name: "Mosh" };
     setUsers([newUser, ...users]);
-    axios
-      .post("https://jsonplaceholder.typicode.com/users/", newUser)
+    apiClient
+      .post("/users/", newUser)
       .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
       .catch((error) => {
         setError(error.messsage);
@@ -70,15 +67,10 @@ function App() {
     const updatedUser = { ...user, name: user.name + "!" };
     const originalUsers = [...users];
     setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
-    axios
-      .patch(
-        "https://jsonplaceholder.typicode.com/users/" + user.id,
-        updatedUser
-      )
-      .catch((error) => {
-        setError(error.message);
-        setUsers(originalUsers);
-      });
+    apiClient.patch("/users/" + user.id, updatedUser).catch((error) => {
+      setError(error.message);
+      setUsers(originalUsers);
+    });
   };
 
   return (
