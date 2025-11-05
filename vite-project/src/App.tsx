@@ -1,42 +1,21 @@
 import Alert from "./components/Alert";
 import Button from "./components/Button";
 import ListGroup from "./components/ListGroup";
-import { useEffect, useState } from "react";
-import { CanceledError } from "./services/api-client";
+import { useState } from "react";
 import type { User } from "./services/user-service";
 import userService from "./services/user-service";
+import useUsers from "./hooks/useUsers";
 
 function App() {
   let items = ["Delhi", "Mumbai", "Varanasi", "Pune"];
   const [alertVisible, setAlertVisibility] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-  const [error, setError] = useState("");
-  const [isLoading, setLoading] = useState(true);
 
   const handleSelect = (item: string) => {
     console.log(item);
     window.open(`https://www.google.com/search?q=${item}`, "_blank");
   };
-  useEffect(() => {
-    setLoading(true);
+  const { users, error, isLoading, setError, setUsers } = useUsers();
 
-    const { request, cancel } = userService.getAll<User>();
-    request
-      .then((res) => {
-        setUsers(res.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        if (error instanceof CanceledError) {
-          return;
-        } else {
-          setError(error.message);
-          setLoading(false);
-        }
-      });
-
-    return () => cancel();
-  }, []);
   const deleteUser = (user: User) => {
     const originalUsers = [...users];
     setUsers(users.filter((u) => user.id !== u.id));
